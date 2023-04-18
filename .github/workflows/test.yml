@@ -18,6 +18,7 @@ jobs:
           $myJson = Get-Content ".github/devops.config" -Raw | ConvertFrom-Json 
           echo $myJson
           $myName = $myJson.name
+          echo "$myName"
           echo "{NAME}={$myName}" >> $GITHUB_ENV
           $env:NAME
           echo {NAME}
