@@ -1,51 +1,65 @@
-name: github_workflows
+name: Collections_new
 on:
   push:
-    branches:
-      - dev
-    paths-ignore:
-      - '.github/workflows'
-
+  workflow_dispatch: 
+  
 jobs:
-  powershell:
+  reading_json:
+    name: Reading JSON
     runs-on: windows-latest
     steps:
-      - name: code chekout
+      - name: code checkout
         uses: actions/checkout@v3
         with:
           fetch-depth: 2
-      - name: List the downloaded files
+      - name: Task1- Read the config file and display the contents of it.
+        id: step1
         run: |
-          echo "Display the latest file and contents in Github Actions."
-          dir
-      - name: Latest file
+          $myJson = Get-Content ".github/devops.config" -Raw | ConvertFrom-Json 
+          echo $myJson
+          $myName = $myJson.name
+          echo "{NAME}={$myName}" >> $GITHUB_ENV
+          $env:NAME
+          echo {NAME}
+          echo "emp_id=$myJson.employee_id" >> $GITHUB_ENV
+          echo "version=myJson.version" >> $GITHUB_ENV
+      - name: Checking value null or not
         run: |
-          #Path of the file is in $path ///.
-          $path = "./Search"
-          #Get the newly created filename and storing in $Filename
-          $Filename = Get-ChildItem $path -File -Recurse | Sort-Object -Property LastWriteTime -Descending  | select -First 1 
-          #Displaying the filename
-          $File = $Filename.Name
-          Write-Host "The newly created file is $File"
-          #Getting the full folderpath of the $File and it is storing it in $FileNamePath
-          $FileNamePath = Get-ChildItem -Path $path -Filter $File -Recurse  | ForEach-Object{$_.FullName} 
-          #Getting the file contents and storing it in $FileContent
-          $FileContent = Get-Content $FileNamePath
-          #Displaying the output of newly created file
-          Write-Host "The content of newly created file is $FileContent"
-  mahima:
+          echo "My name is - $env:NAME" 
+          echo "${{ env.emp_id }}" 
+          echo "${{ env.version }}" 
+          #if ([string]::IsNullOrEmpty(${{ env.name }}) -or [string]::IsNullOrEmpty(${{ env.emp_id }}) -or [string]::IsNullOrEmpty(${{ env.version }})) 
+          #{echo "value is null"}
+  fetching_details:
+    name: Github Details
+    needs: reading_json
     runs-on: windows-latest
     steps:
-      - run: echo "My name is Mahima"
-  github:
-      needs: [powershell, mahima]
-      runs-on: windows-latest
-      steps:
-        - name: Downloading dev repository
-          uses: actions/checkout@v3
-          with: 
-           fetch-depth: 2
-        - name: Latest file using git command
-          run: |
-              git log --name-only --oneline -1
-              echo "github - $GITHUB_USER"
+      - name: Tas4- display workflow ref-path, repo-name, author, build-no, branch name
+        run: |
+          echo "author: ${{ github.repository_owner }}"
+          echo "workflow ref-path: ${{ github.workflow_ref }}"
+          echo "branch name: ${{ github.ref_name }}"
+          echo "build-no: ${{ github.run_number }}"
+          echo "repo name: ${{ github.repository }}"
+  create_secrets:
+    name: Create Secrets
+    needs: fetching_details
+    runs-on: windows-latest
+    steps:
+      - name: Task5- create secrets and use those secrets in your job
+        env:
+          PASSWORD_PS: ${{secrets.PASSWORD}}
+        run: echo $PASSWORD
+  github_release:
+    name: Create Release
+    needs: create_secrets
+    runs-on: windows-latest
+    steps: 
+      - name: Task7 - create a release with (your name - repo name - branch name - workflow no)
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{github.actor}}-${{github.run_number}}
+          release_name: ${{github.actor}}-${{github.run_number}}
