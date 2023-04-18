@@ -21,13 +21,13 @@ jobs:
           echo "$myName"
           echo "name={$myName}" >> $GITHUB_ENV
           echo "emp_id=$myJson.employee_id" >> $GITHUB_ENV
-          echo "version=myJson.version" >> $GITHUB_ENV
+          echo "version=$myJson.version" >> $GITHUB_ENV
       - name: Checking value null or not
         run: |
-          echo "My name is - ${{ env:name }}" 
-          echo "${{ env.emp_id }}" 
-          echo "${{ env.version }}" 
-          #if ([string]::IsNullOrEmpty(${{ env.name }}) -or [string]::IsNullOrEmpty(${{ env.emp_id }}) -or [string]::IsNullOrEmpty(${{ env.version }})) 
+          echo "My name is - $env:name" 
+          echo "$env:emp_id" 
+          echo "$env:version" 
+          #if ([string]::IsNullOrEmpty($env:name) -or [string]::IsNullOrEmpty($env:emp_id) -or [string]::IsNullOrEmpty($env:version)) 
           #{echo "value is null"}
   fetching_details:
     name: Github Details
