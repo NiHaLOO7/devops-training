@@ -15,6 +15,7 @@ jobs:
       - name: Task1- Read the config file and display the contents of it.
         id: step1
         run: |
+          env
           $myJson = Get-Content ".github/devops.config" -Raw | ConvertFrom-Json 
           echo $myJson
           $myName = $myJson.name
