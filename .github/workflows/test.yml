@@ -24,7 +24,7 @@ jobs:
           echo "version=myJson.version" >> $GITHUB_ENV
       - name: Checking value null or not
         run: |
-          echo "My name is - $env:name" 
+          echo "My name is - ${{ env:name }}" 
           echo "${{ env.emp_id }}" 
           echo "${{ env.version }}" 
           #if ([string]::IsNullOrEmpty(${{ env.name }}) -or [string]::IsNullOrEmpty(${{ env.emp_id }}) -or [string]::IsNullOrEmpty(${{ env.version }})) 
