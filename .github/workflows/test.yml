@@ -15,7 +15,6 @@ jobs:
       - name: Task1- Read the config file and display the contents of it.
         id: step1
         run: |
-          env
           $myJson = Get-Content ".github/devops.config" -Raw | ConvertFrom-Json 
           echo $myJson
           $myName = $myJson.name
@@ -25,6 +24,7 @@ jobs:
           echo "version=${myJson.version}" >> $GITHUB_ENV
       - name: Checking value null or not
         run: |
+          env
           echo "My name is - $Env:name" 
           echo "$env:emp_id" 
           echo "$env:version" 
