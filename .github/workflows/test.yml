@@ -19,9 +19,9 @@ jobs:
           echo $myJson
           $myName = $myJson.name
           echo "$myName"
-          echo "name=${myName}"  >> $GITHUB_ENV
-          echo "emp_id=${myJson.employee_id}" >> $GITHUB_ENV
-          echo "version=${myJson.version}" >> $GITHUB_ENV
+          echo "name=${myName}" >> $env:GITHUB_ENV
+          echo "emp_id=${myJson.employee_id}" >> $env:GITHUB_ENV
+          echo "version=${myJson.version}" >> $env:GITHUB_ENV
       - name: Checking value null or not
         run: |
           env
