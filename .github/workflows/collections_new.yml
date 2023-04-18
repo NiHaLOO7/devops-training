@@ -1,0 +1,67 @@
+name: Collections_new
+on:
+  push:
+  workflow_dispatch: 
+  
+jobs:
+ reading_json:
+    name: Reading JSON
+    runs-on: windows-latest
+    steps:
+      - name: code checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: Task1- Read the config file and display the contents of it.
+        id: step1
+        run: |
+          $myJson = Get-Content ".github/devops.config" -Raw | ConvertFrom-Json 
+          echo $myJson
+          $myName = $myJson.name
+          $myEmpId = $myJson.employee_id
+          $Myversion = $myJson.version
+          echo $myName, $myJson.name, $myEmpId, $myJson.employee_id 
+        env: 
+          name: $myName,
+          emp_id: $myEmpId,
+          version: $Myversion
+      - name: Checking value null or not
+        run: |
+          echo "${{ env.name }}" 
+          echo "${{ env.emp_id }}" 
+          echo "${{ env.version }}" 
+          #if ([string]::IsNullOrEmpty(${{ env.name }}) -or [string]::IsNullOrEmpty(${{ env.emp_id }}) -or [string]::IsNullOrEmpty(${{ env.version }})) 
+          #{echo "value is null"}
+ fetching_details:
+    name: Github Details
+    needs: reading_json
+    runs-on: windows-latest
+    steps:
+      - name: Tas4- display workflow ref-path, repo-name, author, build-no, branch name
+        run: |
+          echo "author: ${{ github.repository_owner }}"
+          echo "workflow ref-path: ${{ github.workflow_ref }}"
+          echo "branch name: ${{ github.ref_name }}"
+          echo "build-no: ${{ github.run_number }}"
+          echo "repo name: ${{ github.repository }}"
+ create_secrets:
+    name: Create Secrets
+    needs: fetching_details
+    runs-on: windows-latest
+    steps:
+      - name: Task5- create secrets and use those secrets in your job
+        env:
+          PASSWORD_PS: ${{secrets.PASSWORD}}
+        run: echo $PASSWORD
+ Github_Release:
+    name: Create Release
+    needs: create_secrets
+    runs-on: windows-latest
+    steps: 
+      - name: Task7 - create a release with (your name - repo name - branch name - workflow no)
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 
+        with:
+          tag_name: ${{github.actor}}-${{github.run_number}}
+          release_name: ${{github.actor}}-${{github.run_number}}

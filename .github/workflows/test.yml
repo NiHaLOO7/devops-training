@@ -1,0 +1,51 @@
+name: github_workflows
+on:
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - '.github/workflows'
+
+jobs:
+  powershell:
+    runs-on: windows-latest
+    steps:
+      - name: code chekout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+      - name: List the downloaded files
+        run: |
+          echo "Display the latest file and contents in Github Actions."
+          dir
+      - name: Latest file
+        run: |
+          #Path of the file is in $path ///.
+          $path = "./Search"
+          #Get the newly created filename and storing in $Filename
+          $Filename = Get-ChildItem $path -File -Recurse | Sort-Object -Property LastWriteTime -Descending  | select -First 1 
+          #Displaying the filename
+          $File = $Filename.Name
+          Write-Host "The newly created file is $File"
+          #Getting the full folderpath of the $File and it is storing it in $FileNamePath
+          $FileNamePath = Get-ChildItem -Path $path -Filter $File -Recurse  | ForEach-Object{$_.FullName} 
+          #Getting the file contents and storing it in $FileContent
+          $FileContent = Get-Content $FileNamePath
+          #Displaying the output of newly created file
+          Write-Host "The content of newly created file is $FileContent"
+  mahima:
+    runs-on: windows-latest
+    steps:
+      - run: echo "My name is Mahima"
+  github:
+      needs: [powershell, mahima]
+      runs-on: windows-latest
+      steps:
+        - name: Downloading dev repository
+          uses: actions/checkout@v3
+          with: 
+           fetch-depth: 2
+        - name: Latest file using git command
+          run: |
+              git log --name-only --oneline -1
+              echo "github - $GITHUB_USER"
